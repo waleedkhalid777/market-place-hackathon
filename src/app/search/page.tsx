@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation'; // useSearchParams instead of useRouter
 import Client from '@/sanity/lib/sanityclient';
 import Link from 'next/link';
 
@@ -53,7 +52,7 @@ const ProductList = ({
       }
     };
 
-    if (query && query.trim()) {
+    if (query.trim()) {
       fetchProducts();
     } else {
       setError('Please enter a search term.');
@@ -118,9 +117,7 @@ const ProductList = ({
 };
 
 const SearchPage = () => {
-  const searchParams = useSearchParams(); // useSearchParams hook from Next.js
-  const query = searchParams?.get('query') || ''; // Get the 'query' parameter
-
+  const [query, setQuery] = useState('');
   const [cart, setCart] = useState<Product[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -145,17 +142,6 @@ const SearchPage = () => {
     showNotification(`${product.title} added to cart successfully!`);
   };
 
-  const removeFromCart = (productId: string) => {
-    const updatedCart = cart.filter((item) => item.id !== productId);
-    const removedProduct = cart.find((item) => item.id === productId);
-
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    if (removedProduct) {
-      showNotification(`${removedProduct.title} removed from cart!`);
-    }
-  };
-
   const showNotification = (message: string) => {
     setNotification(message);
     setTimeout(() => {
@@ -171,9 +157,17 @@ const SearchPage = () => {
         </div>
       )}
       <h1 className="text-black font-poppins text-2xl text-center py-10">
-        Search Results for "{query}"
+        Search Products
       </h1>
-
+      <div className="text-center mb-6">
+        <input
+          type="text"
+          placeholder="Enter search term..."
+          className="border border-gray-300 px-4 py-2 rounded w-full max-w-md"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
       <div className="flex-grow">
         {query ? (
           <Suspense fallback={<div>Loading products...</div>}>
