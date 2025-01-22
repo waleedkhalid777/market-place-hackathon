@@ -52,7 +52,7 @@ const ProductList = ({
       }
     };
 
-    if (query.trim()) {
+    if (query && query.trim()) {
       fetchProducts();
     } else {
       setError('Please enter a search term.');
@@ -174,9 +174,13 @@ const SearchPage = () => {
 
       {/* Product List Section */}
       <div className="flex-grow">
-        <Suspense fallback={<div>Loading products...</div>}>
-          <ProductList query={query} addToCart={addToCart} />
-        </Suspense>
+        {query ? (
+          <Suspense fallback={<div>Loading products...</div>}>
+            <ProductList query={query} addToCart={addToCart} />
+          </Suspense>
+        ) : (
+          <p className="text-center text-gray-500">Please enter a search term.</p>
+        )}
       </div>
 
       {/* Cart Section */}
