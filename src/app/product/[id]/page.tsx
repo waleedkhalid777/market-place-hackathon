@@ -1,7 +1,7 @@
 // src/app/product/[id]/page.tsx
-import React from "react";
-import Client from "@/sanity/lib/sanityclient";
-import Image from "next/image";
+
+import React from 'react';
+import Client from '@/sanity/lib/sanityclient';
 
 type Product = {
   id: string;
@@ -14,7 +14,8 @@ type Product = {
   isNew?: boolean;
 };
 
-async function fetchProduct(id: string): Promise<Product | null> {
+// Fetch product data from the Sanity database
+const fetchProductData = async (id: string) => {
   try {
     const data = await Client.fetch(
       `*[_type == "product" && _id == $id] {
@@ -26,56 +27,52 @@ async function fetchProduct(id: string): Promise<Product | null> {
         tags,
         discountPercentage,
         isNew
-      }[0]`,
+      }`,
       { id }
     );
 
-    return data ? { id, ...data } : null;
+    if (data.length === 0) {
+      return null; // If no product found, return null
+    }
+    return data[0]; // Return the first product if found
   } catch (error) {
-    console.error("Error fetching product data:", error);
-    return null;
+    console.error('Error fetching product data:', error);
+    return null; // Return null in case of an error
   }
-}
+};
 
-const ProductDetails = async ({ params }: { params: { id: string } }) => {
-  const product = await fetchProduct(params.id);
+type ProductPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+const ProductDetails = async ({ params }: ProductPageProps) => {
+  const { id } = params;
+  
+  // Fetch product data based on the dynamic id
+  const product = await fetchProductData(id);
 
   if (!product) {
-    return <p className="text-center mt-20">Product not found.</p>;
+    return <p>Product not found.</p>;
   }
 
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Image */}
         <div className="flex justify-center">
-          {product.image ? (
-            <Image
-              src={product.image}
-              alt={product.title}
-              width={400}
-              height={400}
-              className="w-full max-w-sm h-auto object-cover rounded-md shadow-md"
-              unoptimized
-            />
-          ) : (
-            <Image
-              src="/images/placeholder.png"
-              alt="Placeholder"
-              width={400}
-              height={400}
-              className="w-full max-w-sm h-auto object-cover rounded-md shadow-md"
-            />
-          )}
+          {/* Use the regular <img> tag to avoid the image optimization issue */}
+          <img
+            src={product.image || '/placeholder-image-url'} // Fallback image if no product image
+            alt={product.title}
+            className="w-full max-w-sm h-auto object-cover rounded-md shadow-md"
+          />
         </div>
-
-        {/* Product Details */}
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">{product.title}</h1>
           <p className="mt-2 text-gray-600">{product.description}</p>
-          <p className="mt-4 text-xl font-bold text-green-600">Rp {product.price.toLocaleString()}</p>
+          <p className="mt-4 text-xl font-bold text-green-600">Rp {product.price}</p>
 
-          {/* Badges */}
           {product.isNew && (
             <span className="inline-block mt-2 px-4 py-1 text-sm text-white bg-blue-500 rounded-full">
               New Arrival
@@ -87,19 +84,20 @@ const ProductDetails = async ({ params }: { params: { id: string } }) => {
             </span>
           )}
 
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {product.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-block text-sm text-white bg-gray-800 rounded-full px-3 py-1"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="mt-6">
+            {product.tags && (
+              <div className="flex flex-wrap gap-2">
+                {product.tags.map((tag: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | Iterable<React.ReactNode> | null | undefined, index: React.Key | null | undefined) => (
+                  <span
+                    key={index}
+                    className="inline-block text-sm text-white bg-gray-800 rounded-full px-3 py-1"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
