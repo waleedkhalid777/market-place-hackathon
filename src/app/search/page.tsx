@@ -79,12 +79,11 @@ const ProductList = ({
                 </div>
               )}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-300">
-                <button
-                  className="text-red-600 font-bold px-4 py-2 bg-white hover:bg-gray-200"
-                  onClick={() => addToCart(product)}
-                >
-                  Add to Cart
-                </button>
+              <Link href={`/product/${product.id}`} passHref>
+                      <button className="text-white font-bold px-4 py-2 bg-blue-600 hover:bg-blue-500">
+                        Add to Cart
+                      </button>
+                    </Link>
               </div>
             </div>
             <div className="bg-gray-200 w-full text-left p-4">
@@ -103,9 +102,7 @@ const ProductList = ({
                   {product.discountPercentage}% Off
                 </span>
               )}
-              <Link href={`/product/${product.id}`} passHref>
-                <button className="mt-4 text-blue-600 hover:text-blue-800">View Details</button>
-              </Link>
+              
             </div>
           </div>
         ))
