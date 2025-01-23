@@ -13,12 +13,10 @@ type Product = {
   tags?: string[];
   discountPercentage?: number;
   isNew?: boolean;
-  quantity?: number;
 };
 
 const Product = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
@@ -28,11 +26,6 @@ const Product = () => {
   }, []);
 
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-
     const fetchProducts = async () => {
       try {
         const query = `*[_type == "product"] {
@@ -59,38 +52,6 @@ const Product = () => {
 
     fetchProducts();
   }, []);
-
-  const playNotificationSound = (soundFile: string) => {
-    const audio = new Audio(soundFile);
-    audio.play();
-  };
-
-  const addToCart = (product: Product) => {
-    const updatedCart = [...cart];
-    const existingProduct = updatedCart.find((item) => item.id === product.id);
-    if (existingProduct) {
-      existingProduct.quantity = (existingProduct.quantity || 1) + 1;
-    } else {
-      updatedCart.push({ ...product, quantity: 1 });
-    }
-
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    showNotification(`${product.title} added to cart successfully!`);
-    playNotificationSound("/success.wav"); 
-  };
-
-  const removeFromCart = (productId: string) => {
-    const updatedCart = cart.filter((item) => item.id !== productId);
-    const removedProduct = cart.find((item) => item.id === productId);
-
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    if (removedProduct) {
-      showNotification(`${removedProduct.title} removed from cart!`);
-      playNotificationSound("/delete-success.mp3"); // Play sound on delete
-    }
-  };
 
   const showNotification = (message: string) => {
     setNotification(message);
@@ -128,12 +89,11 @@ const Product = () => {
                 </div>
               )}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-300">
-                <button
-                  className="text-red-600 font-bold px-4 py-2 bg-white hover:bg-gray-200"
-                  onClick={() => addToCart(product)}
-                >
-                  Add to Cart
-                </button>
+                <Link href={`/product/${product.id}`}>
+                  <button className="text-red-600 font-bold px-4 py-2 bg-white hover:bg-gray-200">
+                    Add to Cart
+                  </button>
+                </Link>
               </div>
             </div>
             <div className="bg-gray-200 w-full text-left p-4">
@@ -152,84 +112,10 @@ const Product = () => {
                   {product.discountPercentage}% Off
                 </span>
               )}
-              <Link href={`/product/${product.id}`} passHref>
-                <button className="mt-4 text-blue-600 hover:text-blue-800">View Details</button>
-              </Link>
+             
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Cart Section */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
-        {cart.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="col-span-2 overflow-x-auto">
-              <table className="table-auto w-full border-collapse border border-gray-200">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-200 p-4 text-left">Product</th>
-                    <th className="border border-gray-200 p-4 text-right">Price</th>
-                    <th className="border border-gray-200 p-4 text-center">Quantity</th>
-                    <th className="border border-gray-200 p-4 text-right">Subtotal</th>
-                    <th className="border border-gray-200 p-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart.map((item) => (
-                    <tr key={item.id}>
-                      <td className="border border-gray-200 p-4 flex items-center gap-4">
-                        <img
-                          src={item.image || "placeholder-image-url"}
-                          alt={item.title}
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <span>{item.title}</span>
-                      </td>
-                      <td className="border border-gray-200 p-4 text-right">Rp {item.price}</td>
-                      <td className="border border-gray-200 p-4 text-center">{item.quantity}</td>
-                      <td className="border border-gray-200 p-4 text-right">
-                        Rp {(item.price * (item.quantity || 1)).toLocaleString()}
-                      </td>
-                      <td className="border border-gray-200 p-4 text-center">
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="col-span-1 bg-gray-50 p-6 border border-gray-200 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Cart Totals</h3>
-              <div className="flex justify-between border-b pb-2 mb-2">
-                <span>Subtotal:</span>
-                <span>
-                  Rp{" "}
-                  {cart
-                    .reduce(
-                      (total, item) => total + item.price * (item.quantity || 1),
-                      0
-                    )
-                    .toLocaleString()}
-                </span>
-              </div>
-              <button
-                onClick={() => (window.location.href = "/checkout")}
-                className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600"
-              >
-                Checkout
-              </button>
-            </div>
-          </div>
-        ) : (
-          <p className="mt-4 text-gray-600">Your cart is empty.</p>
-        )}
       </div>
     </div>
   );
