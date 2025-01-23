@@ -1,5 +1,4 @@
-'use client';
-
+"use client"
 import React, { useEffect, useState } from 'react';
 import Client from '@/sanity/lib/sanityclient';
 import { useParams } from 'next/navigation';
@@ -13,6 +12,11 @@ type Product = {
   tags?: string[];
   discountPercentage?: number;
   isNew?: boolean;
+};
+
+type CartItem = Product & {
+  quantity: number;
+  subtotal: number;
 };
 
 const fetchProductData = async (id: string) => {
@@ -44,6 +48,7 @@ const fetchProductData = async (id: string) => {
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,8 +58,67 @@ const ProductDetails = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    setCartMessage(`${product?.title} has been added to the cart.`);
-    setTimeout(() => setCartMessage(null), 3000); // Clear the message after 3 seconds
+    if (!product) return;
+
+    const existingProductIndex = cart.findIndex((item) => item.id === product.id);
+    if (existingProductIndex !== -1) {
+      const updatedCart = [...cart];
+      updatedCart[existingProductIndex].quantity += 1;
+      updatedCart[existingProductIndex].subtotal = updatedCart[existingProductIndex].quantity * product.price;
+      setCart(updatedCart);
+    } else {
+      const newCartItem: CartItem = {
+        ...product,
+        quantity: 1,
+        subtotal: product.price,
+      };
+      setCart((prevCart) => [...prevCart, newCartItem]);
+    }
+
+    setCartMessage(`${product.title} has been added to the cart.`);
+    setTimeout(() => setCartMessage(null), 3000);
+  };
+
+  const handleRemoveFromCart = (id: string) => {
+    const updatedCart = cart.filter((item) => item.id !== id);
+    setCart(updatedCart);
+  };
+
+  const handleIncreaseQuantity = (id: string) => {
+    const updatedCart = [...cart];
+    const itemIndex = updatedCart.findIndex((item) => item.id === id);
+    if (itemIndex !== -1) {
+      updatedCart[itemIndex].quantity += 1;
+      updatedCart[itemIndex].subtotal = updatedCart[itemIndex].quantity * updatedCart[itemIndex].price;
+      setCart(updatedCart);
+    }
+  };
+
+  const handleDecreaseQuantity = (id: string) => {
+    const updatedCart = [...cart];
+    const itemIndex = updatedCart.findIndex((item) => item.id === id);
+    if (itemIndex !== -1 && updatedCart[itemIndex].quantity > 1) {
+      updatedCart[itemIndex].quantity -= 1;
+      updatedCart[itemIndex].subtotal = updatedCart[itemIndex].quantity * updatedCart[itemIndex].price;
+      setCart(updatedCart);
+    }
+  };
+
+  const calculateCartTotal = () => {
+    return cart.reduce((total, item) => total + item.subtotal, 0);
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    // Store cart data in localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    // Redirect to the checkout page
+    window.location.href = "/checkout";
   };
 
   if (!product) {
@@ -158,6 +222,50 @@ const ProductDetails = () => {
               Tags: {product.tags?.join(", ") || "N/A"}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Cart Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-semibold">Your Cart</h2>
+        <div className="mt-4">
+          {cart.length === 0 ? (
+            <p>Your cart is empty</p>
+          ) : (
+            <div>
+              <ul>
+                {cart.map((item, index) => (
+                  <li key={index} className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item.image || '/placeholder-image-url'}
+                        alt={item.title}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div>
+                        <p className="font-bold">{item.title}</p>
+                        <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <p className="font-bold">Rp {item.subtotal}</p>
+                      <button onClick={() => handleIncreaseQuantity(item.id)} className="px-2 py-1 bg-gray-200 rounded-md">+</button>
+                      <button onClick={() => handleDecreaseQuantity(item.id)} className="px-2 py-1 bg-gray-200 rounded-md">-</button>
+                      <button onClick={() => handleRemoveFromCart(item.id)} className="px-2 py-1 bg-red-500 text-white rounded-md">
+                        Remove
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 flex justify-between">
+                <p className="text-lg font-semibold">Cart Total: Rp {calculateCartTotal()}</p>
+                <button onClick={handleCheckout} className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800">
+                  Checkout
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
