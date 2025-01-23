@@ -1,21 +1,57 @@
 // pages/contact.tsx
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import Image from "next/image";
 
 const Contact: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [formStatus, setFormStatus] = useState<string | null>(null);
+
+  // Handle input change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
+      setFormStatus("Please fill out all required fields.");
+      return;
+    }
+
+    // Simulate form submission
+    setFormStatus("Submitting...");
+
+    // Fake API call
+    setTimeout(() => {
+      setFormStatus("Thank you! Your message has been sent successfully.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    }, 2000);
+  };
+
   return (
     <>
       {/* Hero Section */}
       <div className="relative h-80 flex items-center justify-center">
         <div className="absolute inset-0">
           <Image
-            src="/shop.jpg" 
+            src="/shop.jpg"
             alt="Shop Hero Background"
             layout="fill"
             objectFit="cover"
             priority
-            className="z-0 blur-[3px]" 
+            className="z-0 blur-[3px]"
           />
         </div>
 
@@ -29,7 +65,6 @@ const Contact: React.FC = () => {
         </div>
       </div>
 
-      
       <div className="font-sans p-5">
         <h1 className="text-2xl text-center mb-1">Get In Touch With Us</h1>
         <p className="text-red-500 text-center mb-5">
@@ -39,7 +74,6 @@ const Contact: React.FC = () => {
         </p>
 
         <div className="flex flex-wrap justify-between mt-5">
-          
           <div className="w-full md:w-2/5 leading-7 text-sm text-gray-800">
             <div className="mb-4">
               <strong className="block mb-1">Address</strong>
@@ -59,65 +93,60 @@ const Contact: React.FC = () => {
             </div>
           </div>
 
-        
           <div className="w-full md:w-1/2 p-5 border border-gray-300 rounded bg-white">
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="block mb-1 font-bold"
-                >
+                <label htmlFor="name" className="block mb-1 font-bold">
                   Your Name
                 </label>
                 <input
                   id="name"
                   type="text"
                   placeholder="Abc"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
               </div>
 
               <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block mb-1 font-bold"
-                >
+                <label htmlFor="email" className="block mb-1 font-bold">
                   Email Address
                 </label>
                 <input
                   id="email"
                   type="email"
                   placeholder="Abc@def.com"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
               </div>
 
               <div className="mb-4">
-                <label
-                  htmlFor="subject"
-                  className="block mb-1 font-bold"
-                >
+                <label htmlFor="subject" className="block mb-1 font-bold">
                   Subject
                 </label>
                 <input
                   id="subject"
                   type="text"
                   placeholder="This is optional"
+                  value={formData.subject}
+                  onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
               </div>
 
               <div className="mb-5">
-                <label
-                  htmlFor="message"
-                  className="block mb-1 font-bold"
-                >
+                <label htmlFor="message" className="block mb-1 font-bold">
                   Message
                 </label>
                 <textarea
                   id="message"
                   placeholder="Hi! I'd like to ask about..."
                   rows={4}
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 ></textarea>
               </div>
@@ -129,10 +158,22 @@ const Contact: React.FC = () => {
                 Submit
               </button>
             </form>
+
+            {/* Display form status */}
+            {formStatus && (
+              <p
+                className={`mt-4 text-sm ${
+                  formStatus.includes("Thank you")
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {formStatus}
+              </p>
+            )}
           </div>
         </div>
 
-        
         <div className="flex flex-wrap justify-between mt-10 pt-5 border-t border-gray-300 text-sm text-gray-600">
           <p>🌟 High-quality crafted from top materials</p>
           <p>🛡️ Warranty Protection Over 2 years</p>
