@@ -43,7 +43,6 @@ const Checkout = () => {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null); 
   const [paymentSuccessful, setPaymentSuccessful] = useState(false); 
-  const [orderSuccess, setOrderSuccess] = useState(false); 
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
@@ -79,19 +78,13 @@ const Checkout = () => {
     setError(null);
 
     // Simulate payment processing
-    try {
-      // Simulating successful payment
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate payment delay
-
+    setTimeout(() => {
       setPaymentSuccessful(true);
       setLoading(false);
-    } catch (error) {
-      setError("Payment failed. Please try again.");
-      setLoading(false);
-    }
+    }, 2000);
   };
 
-  const handleOrderSubmit = async (e: React.FormEvent) => {
+  const handleOrderSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
@@ -100,53 +93,24 @@ const Checkout = () => {
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    setOrderPlaced(true);
+    localStorage.removeItem("cart");
+    setCartItems([]);
+    setFormData({
+      firstName: "",
+      lastName: "",
+      company: "",
+      country: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      phone: "",
+      email: "",
+    });
 
-    const orderData = {
-      customer: formData,
-      items: cartItems,
-      totalAmount: calculateTotal(),
-    };
-
-    try {
-      const response = await fetch("https://677f7b3f0476123f76a6a74b.mockapi.io/test", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setOrderSuccess(true);
-        setOrderPlaced(true);
-        localStorage.removeItem("cart");
-        setCartItems([]);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          company: "",
-          country: "",
-          address: "",
-          city: "",
-          postalCode: "",
-          phone: "",
-          email: "",
-        });
-        setTimeout(() => {
-          setOrderSuccess(false); 
-        }, 3000);
-      } else {
-        setError("Failed to place the order. Please try again.");
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setTimeout(() => setLoading(false), 3000);
-    }
+    setTimeout(() => {
+      setOrderPlaced(false);
+    }, 3000);
   };
 
   if (loading)
@@ -264,7 +228,11 @@ const Checkout = () => {
               className="mt-6 w-full py-2 bg-black text-white rounded hover:bg-gray-800"
               disabled={!paymentSuccessful} 
             >
-              {orderPlaced ? "Order Placed!" : "Place Order"}
+              {orderPlaced ? (
+                <span className="flex items-center justify-center">
+                  <FaCheckCircle className="mr-2 text-green-500" /> Order Placed!
+                </span>
+              ) : "Place Order"}
             </button>
           </form>
         </div>
@@ -273,7 +241,7 @@ const Checkout = () => {
           <h2 className="text-lg font-semibold mb-6">Order Summary</h2>
           <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
             {cartItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center mb-4">
+              <div key={item.id || item.title} className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">
                   <img
                     src={item.image || "/placeholder.png"}
@@ -343,16 +311,6 @@ const Checkout = () => {
       {paymentSuccessful && !orderPlaced && (
         <div className="mt-6 text-center text-green-600">
           <p>Payment successful! Now you can place your order.</p>
-        </div>
-      )}
-
-      {orderSuccess && (
-        <div
-          className="mt-6 text-center text-green-600 animate-fade-in"
-          style={{ animation: 'fadeIn 2s' }}
-        >
-          <FaCheckCircle size={30} className="inline-block mr-2 text-green-500" />
-          <p>Order placed successfully!</p>
         </div>
       )}
     </div>
