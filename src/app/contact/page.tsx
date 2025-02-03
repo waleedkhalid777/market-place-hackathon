@@ -1,8 +1,8 @@
-// pages/contact.tsx
-"use client"
+"use client";
 import React, { useState } from "react";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import Image from "next/image";
+import { motion } from "framer-motion"; // Import Framer Motion
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +43,12 @@ const Contact: React.FC = () => {
   return (
     <>
       {/* Hero Section */}
-      <div className="relative h-80 flex items-center justify-center">
+      <motion.div
+        className="relative h-80 flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
         <div className="absolute inset-0">
           <Image
             src="/shop.jpg"
@@ -56,16 +61,33 @@ const Contact: React.FC = () => {
         </div>
 
         <div className="relative z-10 text-center">
-          <h1 className="text-4xl font-bold text-black">Contact</h1>
-          <div className="flex justify-center mt-2">
+          <motion.h1
+            className="text-4xl font-bold text-black"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 1 }}
+          >
+            Contact
+          </motion.h1>
+          <motion.div
+            className="flex justify-center mt-2"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7, duration: 1 }}
+          >
             <h2 className="text-xl font-bold text-black">Home</h2>
             <MdKeyboardArrowRight className="text-2xl text-black mx-2" />
             <h2 className="text-xl font-bold text-black">contact</h2>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="font-sans p-5">
+      <motion.div
+        className="font-sans p-5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+      >
         <h1 className="text-2xl text-center mb-1">Get In Touch With Us</h1>
         <p className="text-red-500 text-center mb-5">
           For more information about our product & services, please feel free
@@ -74,7 +96,12 @@ const Contact: React.FC = () => {
         </p>
 
         <div className="flex flex-wrap justify-between mt-5">
-          <div className="w-full md:w-2/5 leading-7 text-sm text-gray-800">
+          <motion.div
+            className="w-full md:w-2/5 leading-7 text-sm text-gray-800"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 1 }}
+          >
             <div className="mb-4">
               <strong className="block mb-1">Address</strong>
               328 5th SE Avenue, New York NY10000, United States
@@ -91,11 +118,16 @@ const Contact: React.FC = () => {
               Monday-Friday: 9:00 - 22:00<br />
               Saturday-Sunday: 9:00 - 21:00
             </div>
-          </div>
+          </motion.div>
 
           <div className="w-full md:w-1/2 p-5 border border-gray-300 rounded bg-white">
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
+              <motion.div
+                className="mb-4"
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 1 }}
+              >
                 <label htmlFor="name" className="block mb-1 font-bold">
                   Your Name
                 </label>
@@ -107,9 +139,14 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-4">
+              <motion.div
+                className="mb-4"
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.6, duration: 1 }}
+              >
                 <label htmlFor="email" className="block mb-1 font-bold">
                   Email Address
                 </label>
@@ -121,9 +158,14 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-4">
+              <motion.div
+                className="mb-4"
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.7, duration: 1 }}
+              >
                 <label htmlFor="subject" className="block mb-1 font-bold">
                   Subject
                 </label>
@@ -135,9 +177,14 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-5">
+              <motion.div
+                className="mb-5"
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.8, duration: 1 }}
+              >
                 <label htmlFor="message" className="block mb-1 font-bold">
                   Message
                 </label>
@@ -149,27 +196,35 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 ></textarea>
-              </div>
+              </motion.div>
 
-              <button
+              <motion.button
                 type="submit"
                 className="bg-yellow-500 text-white px-5 py-2 rounded text-sm hover:bg-yellow-600"
+                whileHover={{ scale: 1.1 }} // Slight zoom on hover
+                whileTap={{ scale: 0.95 }} // Tap effect
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2, duration: 0.6 }}
               >
                 Submit
-              </button>
+              </motion.button>
             </form>
 
             {/* Display form status */}
             {formStatus && (
-              <p
+              <motion.p
                 className={`mt-4 text-sm ${
                   formStatus.includes("Thank you")
                     ? "text-green-600"
                     : "text-red-600"
                 }`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2.2, duration: 1 }}
               >
                 {formStatus}
-              </p>
+              </motion.p>
             )}
           </div>
         </div>
@@ -180,7 +235,7 @@ const Contact: React.FC = () => {
           <p>🚚 Free Shipping Order over $150</p>
           <p>📞 24/7 Dedicated Support</p>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };
