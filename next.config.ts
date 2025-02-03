@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
 
-const  NextConfig = {
-  /* config options here */
-
+const nextConfig: NextConfig = {
   images: {
-    domain: ["cdn.sanity"]
-  }
+    domains: ["cdn.sanity.io"], // Corrected key name and syntax
+  },
 };
 
-
+export default nextConfig;
