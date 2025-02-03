@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion"; // Import Framer Motion
 import Client from "@/sanity/lib/sanityclient";
 import Link from "next/link";
 
@@ -73,28 +74,48 @@ const Product = () => {
       )}
       {/* Products Section */}
       <h1 className="text-black font-poppins text-2xl text-center py-10">Our Products</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <div key={product.id} className="relative text-center group max-w-full">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        initial={{ opacity: 0 }} // Initial animation state
+        animate={{ opacity: 1 }} // Final animation state
+        transition={{ duration: 1 }} // Transition duration
+      >
+        {products.map((product, index) => (
+          <motion.div
+            key={product.id}
+            className="relative text-center group max-w-full"
+            initial={{ opacity: 0, y: 50 }} // Initial animation for each product
+            whileInView={{ opacity: 1, y: 0 }} // Final animation when the element comes into view
+            transition={{
+              delay: index * 0.1,
+              duration: 0.5,
+            }} // Staggered delay for each product
+            viewport={{ once: true }} // Animate only once when in view
+          >
             <div className="w-full h-72 overflow-hidden bg-gray-100 relative">
               {product.image ? (
-                <img
+                <motion.img
                   src={product.image}
                   alt={product.title}
                   className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.1 }} // Zoom in effect on hover
+                  transition={{ duration: 0.3 }}
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                   <span className="text-gray-500">No Image</span>
                 </div>
               )}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-300">
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-300"
+                whileHover={{ scale: 1.05 }} // Slight scale-up effect for hover button
+              >
                 <Link href={`/product/${product.id}`}>
                   <button className="text-red-600 font-bold px-4 py-2 bg-white hover:bg-gray-200">
                     Add to Cart
                   </button>
                 </Link>
-              </div>
+              </motion.div>
             </div>
             <div className="bg-gray-200 w-full text-left p-4">
               <h3 className="text-lg text-gray-800 font-bold">{product.title}</h3>
@@ -112,11 +133,10 @@ const Product = () => {
                   {product.discountPercentage}% Off
                 </span>
               )}
-             
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };
