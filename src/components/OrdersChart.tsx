@@ -1,6 +1,7 @@
 "use client";
 
-import { Bar } from "react-chartjs-2";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +14,9 @@ import {
   ChartData,
 } from "chart.js";
 
+// Dynamically import Bar chart to prevent SSR issues
+const Bar = dynamic(() => import("react-chartjs-2").then((mod) => mod.Bar), { ssr: false });
+
 // Register required Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -23,6 +27,14 @@ interface OrderItem {
 }
 
 export default function OrdersChart({ items }: { items: OrderItem[] }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="text-center p-6">Loading chart...</div>;
+
   const data: ChartData<"bar"> = {
     labels: items.map((item) => item.date),
     datasets: [
