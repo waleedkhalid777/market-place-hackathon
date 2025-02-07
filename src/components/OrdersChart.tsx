@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   ChartOptions,
+  ChartData,
 } from "chart.js";
 
 // Register required Chart.js components
@@ -22,18 +23,18 @@ interface OrderItem {
 }
 
 export default function OrdersChart({ items }: { items: OrderItem[] }) {
-  const data = {
-    labels: items.map((item) => item.date), // ✅ Ensures labels are correctly mapped
+  const data: ChartData<"bar"> = {
+    labels: items.map((item) => item.date),
     datasets: [
       {
         label: "Orders",
-        data: items.map((item) => item.totalOrders || 0), // ✅ Handles potential undefined values
-        backgroundColor: "rgba(0, 168, 255, 0.4)", // Light blue color
-        borderColor: "rgba(0, 168, 255, 1)", // Darker blue color
+        data: items.map((item) => item.totalOrders || 0),
+        backgroundColor: "rgba(0, 168, 255, 0.4)",
+        borderColor: "rgba(0, 168, 255, 1)",
         borderWidth: 2,
-        barThickness: 40, // Slightly thicker bars
-        borderRadius: 8, // Rounded bar corners
-        hoverBackgroundColor: "rgba(0, 168, 255, 0.6)", // Hover effect
+        barThickness: 40,
+        borderRadius: 8,
+        hoverBackgroundColor: "rgba(0, 168, 255, 0.6)",
       },
     ],
   };
@@ -44,19 +45,12 @@ export default function OrdersChart({ items }: { items: OrderItem[] }) {
     plugins: {
       legend: {
         position: "top",
-        labels: {
-          font: {
-            size: 14,
-            family: "Arial, sans-serif",
-          },
-        },
       },
       title: {
         display: true,
         text: "Total Orders Overview",
         font: {
           size: 20,
-          family: "Arial, sans-serif",
           weight: "bold",
         },
         color: "#333",
@@ -64,27 +58,13 @@ export default function OrdersChart({ items }: { items: OrderItem[] }) {
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Arial, sans-serif",
-          },
-        },
+        grid: { display: false },
+        ticks: { font: { size: 12 } },
       },
       y: {
         beginAtZero: true,
-        grid: {
-          color: "rgba(0,0,0,0.1)",
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Arial, sans-serif",
-          },
-        },
+        grid: { color: "rgba(0,0,0,0.1)" },
+        ticks: { font: { size: 12 } },
       },
     },
   };
