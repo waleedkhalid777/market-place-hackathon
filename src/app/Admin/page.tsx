@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { client } from "@/sanity/lib/client";
 import CountMeter from "@/components/CountMeter";
-import OrdersChart from "@/components/OrdersChart";
-import RevenueChart from "@/components/RevenueChart";
+
 
 export default function Page() {
   const [data, setData] = useState<
@@ -48,8 +47,7 @@ export default function Page() {
     <main className="flex flex-col gap-6 p-5">
       <CountMeter />
       <div className="flex flex-col md:flex-row gap-5">
-        <RevenueChart items={data} />
-        <OrdersChart items={data.map((item) => ({ date: item.date, totalOrders: item.data.totalOrders }))} />
+     
       </div>
     </main>
   );
