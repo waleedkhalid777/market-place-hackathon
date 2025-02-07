@@ -1,102 +1,118 @@
-"use client"
-import { useState, useEffect, ChangeEvent } from "react";
+"use client";
 
-export default function Login() {
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+
+const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [newPassword, setNewPassword] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
-    const adminSession = sessionStorage.getItem("isAdmin");
-    if (adminSession === "true") {
-      setIsLoggedIn(true);
+    const loggedIn = localStorage.getItem("isLoggedIn");
+    if (loggedIn === "true") {
+      router.push("/Admin"); // Direct to admin page if already logged in
     }
-  }, []);
+  }, [router]);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (email === "admin@example.com" && password === "admin123") {
-      sessionStorage.setItem("isAdmin", "true");
-      setIsLoggedIn(true); // Update login state
-      window.location.href = "/admin"; // Redirect to admin dashboard
+    const adminEmail = "memonwaleed45@gmail.com"; // Set your admin email
+    const adminPassword = "memon786"; // Set your admin password
+
+    if (email === adminEmail && password === adminPassword) {
+      setMessage("Login successful");
+      localStorage.setItem("isLoggedIn", "true"); // Set login status in local storage
+      setIsLoggedIn(true);
+      router.push("/Admin");
     } else {
-      setError("Invalid credentials");
+      if (email !== adminEmail) {
+        setMessage("Invalid email address");
+      } else if (password !== adminPassword) {
+        setMessage("Invalid password");
+      }
     }
   };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("isAdmin");
-    setIsLoggedIn(false);
-    window.location.href = "/login"; // Redirect to login page
-  };
-
-  const handlePasswordUpdate = (newPassword: string) => {
-    // Placeholder for password update logic (e.g., API call to backend)
-    if (newPassword) {
-      alert("Password updated successfully!");
-      // You can also implement a password change form here.
-    }
-  };
-
-  if (isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white p-6 rounded shadow-md w-96">
-          <h2 className="text-xl font-bold mb-4">Admin Dashboard</h2>
-          <button
-            onClick={handleLogout}
-            className="w-full bg-red-600 text-white py-2 rounded mb-4"
-          >
-            Logout
-          </button>
-          <div>
-            <h3 className="text-lg font-semibold">Change Password</h3>
-            <input
-              type="password"
-              placeholder="New Password"
-              className="w-full p-2 border rounded mb-4"
-              onChange={(e) => handlePasswordUpdate(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-96">
-        <h2 className="text-xl font-bold mb-4">Admin Login</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="flex justify-center items-center min-h-screen bg-gray-900">
+      <form
+        onSubmit={handleLogin}
+        className="bg-gray-800 p-8 rounded-lg shadow-lg w-96"
+      >
+        <h2 className="text-2xl font-semibold text-center mb-6 text-white">
+          Admin Login
+        </h2>
+        {message && (
+          <div
+            className={`mb-4 p-2 text-center ${
+              message.includes("Invalid") ? "text-red-500" : "text-green-500"
+            }`}
+          >
+            {message}
+          </div>
+        )}
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-semibold">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-300"
+          >
+            Email
+          </label>
+          <div className="relative">
+            <input
+              type="email"
+              id="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-2 pl-10 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 bg-gray-900 text-white placeholder-gray-400"
+            />
+            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          </div>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-semibold">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+        <div className="mb-6">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-300"
+          >
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={passwordVisible ? "text" : "password"}
+              id="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-2 pl-10 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 bg-gray-900 text-white placeholder-gray-400"
+            />
+            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <button
+              type="button"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            >
+              {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
         </div>
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+        <button
+          type="submit"
+          className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           Login
         </button>
       </form>
     </div>
   );
-}
+};
+
+export default LoginPage;
